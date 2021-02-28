@@ -8,8 +8,8 @@ namespace PMHW10.Services
 {
     public interface IPrimesFinderService
     {
-       public Task<bool> CheckIsPrime();
-       public Task<Result> FindPrimesInRange();
+       public Task<bool> CheckIsPrime(int num);
+       public Task<Result> FindPrimesInRange(int from, int to);
 
     }
 }

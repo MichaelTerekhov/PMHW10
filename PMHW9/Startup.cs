@@ -29,8 +29,6 @@ namespace PMHW9
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-
-            services.AddSingleton<ISettings, Settings>();
             services.AddTransient<IPrimesFinderService, PrimesFinderService>();
             services.AddSwaggerGen();
         }

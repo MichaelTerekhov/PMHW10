@@ -11,28 +11,27 @@ namespace PMHW10.Services.Impl
 {
     public class PrimesFinderService:IPrimesFinderService
     {
-        public PrimesFinderService(ISettings settings, ILogger<PrimesFinderService> logger)
+        public PrimesFinderService(ILogger<PrimesFinderService> logger)
         {
-            this.settings = settings;
             this.logger = logger;
         }
-        public Task<bool> CheckIsPrime()
+        public Task<bool> CheckIsPrime(int num)
         {
             logger.LogInformation("Trying to get settings to check is it number is prime.");
-            if (settings.PrimesFrom < 2)
+            if (num < 2)
             {
-                logger.LogWarning($"Can`t to check, because settings param: {settings.PrimesFrom}\n" +
+                logger.LogWarning($"Can`t to check, because settings param: {num}\n" +
                     $"does not meet the possible conditions for searching prime numbers");
                 return Task.FromResult(false);
             }
             else
             {
-                var result = PrimeAlgoFinder(settings.PrimesFrom);
-                logger.LogInformation($"Operation succeded: Number -> {settings.PrimesFrom} Prime: {result}");
+                var result = PrimeAlgoFinder(num);
+                logger.LogInformation($"Operation succeded: Number -> {num} Prime: {result}");
                 return Task.FromResult(result);
             }
         }
-        public async Task<Result> FindPrimesInRange()
+        public async Task<Result> FindPrimesInRange(int from, int to)
         {
             return await Task.Run(() =>
             {
@@ -40,11 +39,11 @@ namespace PMHW10.Services.Impl
                 timer.Start();
                 logger.LogInformation("Trying to get settings to check is it number is prime.");
                 List<int> result = new List<int>();
-                if ((settings.PrimesFrom > settings.PrimesTo) && settings.PrimesFrom > 0)
+                if ((from > to) && from > 0)
                 {
                     timer.Stop();
 
-                    logger.LogInformation($"Primes in range from {settings.PrimesFrom} to {settings.PrimesTo} wasn`t found");
+                    logger.LogInformation($"Primes in range from {from} to {to} wasn`t found");
                     return new Result
                     {
                         Duration = TimeParser(timer),
@@ -53,10 +52,10 @@ namespace PMHW10.Services.Impl
                         Success = true
                     };
                 }
-                if (settings.PrimesFrom < 0 && settings.PrimesTo < 0)
+                if (from < 0 && to < 0)
                 {
                     timer.Stop();
-                    logger.LogInformation($"Primes in range from {settings.PrimesFrom} to {settings.PrimesTo} wasn`t found");
+                    logger.LogInformation($"Primes in range from {from} to {to} wasn`t found");
                     return new Result
                     {
                         Duration = TimeParser(timer),
@@ -66,7 +65,7 @@ namespace PMHW10.Services.Impl
                     };
                 }
 
-                for (var i = settings.PrimesFrom; i < settings.PrimesTo + 1; i++)
+                for (var i = from; i < to + 1; i++)
                 {
                     if (i <= 1) continue;
                     var isPrime = true;
@@ -82,7 +81,7 @@ namespace PMHW10.Services.Impl
                     result.Add(i);
                 }
                 timer.Stop();
-                logger.LogInformation($"Primes in range from {settings.PrimesFrom} to {settings.PrimesTo} was found succesfully");
+                logger.LogInformation($"Primes in range from {from} to {to} was found succesfully");
                 return new Result
                 {
                     Duration = TimeParser(timer),
@@ -108,7 +107,6 @@ namespace PMHW10.Services.Impl
                     ts.Milliseconds / 10);
             return elapsedTime;
         }
-        private ISettings settings;
         private ILogger<PrimesFinderService> logger;
     }
 }

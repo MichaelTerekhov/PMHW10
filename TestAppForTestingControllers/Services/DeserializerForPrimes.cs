@@ -7,9 +7,9 @@ using System.Text.Json.Serialization;
 
 namespace TestAppForTestingControllers.Services
 {
-    public class DesirializerForPrimes
+    public class DeserializerForPrimes
     {
-        public DesirializerForPrimes()
+        public DeserializerForPrimes()
         {
         }
         public Dictionary<string, int> GetOptionsList()

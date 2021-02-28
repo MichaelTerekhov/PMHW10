@@ -18,11 +18,9 @@ namespace PMHW10.Controllers
     public class PrimesController : ControllerBase
     {
         public PrimesController(
-            ISettings settings,
             IPrimesFinderService finder,
             ILogger<PrimesFinderService> logger)
         {
-            this.settings = settings;
             this.logger = logger;
             _finder = finder;
         }
@@ -33,8 +31,7 @@ namespace PMHW10.Controllers
         public async Task<ActionResult<int>> GetStatusOfPrimeNumber(int num)
         {
             logger.LogInformation("Executing method for checking if this number is prime...");
-            settings.PrimesFrom = num;
-            var checkIsPrime = await _finder.CheckIsPrime();
+            var checkIsPrime = await _finder.CheckIsPrime(num);
             if (checkIsPrime == true)
                 return Ok();
             else
@@ -56,9 +53,7 @@ namespace PMHW10.Controllers
             }
             else
             {
-                settings.PrimesFrom = fromParam;
-                settings.PrimesTo = toParam;
-                var result = await _finder.FindPrimesInRange();
+                var result = await _finder.FindPrimesInRange(fromParam, toParam);
                 var options = new JsonSerializerOptions
                 {
                     WriteIndented = true,
@@ -68,7 +63,6 @@ namespace PMHW10.Controllers
                 return Ok(jsonOutput);
             }
         }
-        private readonly ISettings settings;
         private readonly ILogger<PrimesFinderService> logger;
         private readonly IPrimesFinderService _finder;
     }

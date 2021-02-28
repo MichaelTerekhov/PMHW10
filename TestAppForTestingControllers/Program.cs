@@ -61,15 +61,13 @@ namespace TestAppForTestingControllers
             await IsPrimeProcessor.PrimeChecker(client, "primes/1", 404);
             await IsPrimeProcessor.PrimeChecker(client, "primes/13", 200);
             Console.WriteLine("Chechking some optional get requests for prime numbers");
-            var testingDictionary = new DesirializerForPrimes().GetOptionsList();
-            foreach (var m in testingDictionary)
-            {
-                await Task.Run(() => IsPrimeProcessor.PrimeChecker(client, m.Key, m.Value));
-            }
-            await Task.WhenAll();
+            var testingDictionary = new DeserializerForPrimes().GetOptionsList();
+            var tasks = testingDictionary.Select(x => IsPrimeProcessor.PrimeChecker(client, x.Key, x.Value));
+            await Task.WhenAll(tasks);
         }
         private static async Task IsPrimeNumberRangeCorrectCheckingEndpoint(HttpClient client)
         {
+            Console.WriteLine("This part has two tests that false optionally!");
             Console.ForegroundColor = ConsoleColor.Magenta;
             await PrimesRangeProcessor.CollectPrimeRanges(client, "primes/?from=abc", new List<int>() { 2, 3, 5 });
 
@@ -77,12 +75,9 @@ namespace TestAppForTestingControllers
             Console.ForegroundColor = ConsoleColor.Cyan;
             var jsonSettings = await File.ReadAllTextAsync("primesLists.json");
             var testingDictionary = JsonSerializer.Deserialize<Dictionary<string, List<int>>>(jsonSettings);
-            foreach (var m in testingDictionary)
-            {
-                await Task.Run(() => PrimesRangeProcessor.CollectPrimeRanges(client, m.Key, m.Value));
-            }
-            Console.ResetColor();
-            await Task.WhenAll();
+            var tasks = await Task.Factory.StartNew(()=>
+                testingDictionary.Select(x => PrimesRangeProcessor.CollectPrimeRanges(client,x.Key,x.Value)));
+            await Task.WhenAll(tasks);
         }
     }
 }
